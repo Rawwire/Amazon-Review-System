@@ -59,7 +59,6 @@ if st.button("SUBMIT"):
             with price_left:
                 if amazon_url:
                     headers = {"User-Agent": ua.random}
-                    st.write(headers)
                     request = urllib.request.Request(amazon_url, headers=headers)
                     try:
                         response = urllib.request.urlopen(request)
