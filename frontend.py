@@ -287,7 +287,6 @@ if st.button("SUBMIT"):
                 specs=specifications.spec(soup1)
                 df = pd.DataFrame(specs.items(),columns=["Specs","Value"])
                 st.write(df)
-        st.write("hello")
                                     
 
 
