@@ -11,6 +11,7 @@ try:
     nltk.data.find('corpora/stopwords.zip')
 except LookupError:
     nltk.download('stopwords')
+nltk.download('punkt')
 ua = UserAgent()
 rake = Rake()
 
