@@ -6,7 +6,11 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.probability import FreqDist
 from fake_useragent import UserAgent
 from rake_nltk import Rake
-
+import nltk
+try:
+    nltk.data.find('corpora/stopwords.zip')
+except LookupError:
+    nltk.download('stopwords')
 ua = UserAgent()
 rake = Rake()
 
