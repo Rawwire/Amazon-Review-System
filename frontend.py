@@ -29,7 +29,7 @@ with st.container():
         display_centered_title("Amazon Guider", level=2, font_size=48)
 st.write("")
 st.write("")
-sub="Hello, Our project allows you a best purchase guide for amazon.in products!!!"
+sub="Hey User, We are here to help on product analytics of amazon.in products"
 style=f"text-align: center;font-size: 18px;"
 st.markdown(f"<h1 style='{style}'>{sub}<h1>", unsafe_allow_html=True)
 
@@ -37,7 +37,7 @@ def display_centered_des(text, level=1, font_size=38):
     style = f"text-align: center; font-size: {font_size}px;"
     st.markdown(f"<h{level} style='{style}'>{text}</h{level}>", unsafe_allow_html=True)
 
-display_centered_des("Please enter or paste amazon.in url in below box to get started", level=2, font_size=24)
+display_centered_des("Let's get started", level=2, font_size=24)
 
 
 amazon_url = st.text_input("Enter or paste the URL:")
@@ -108,43 +108,14 @@ if st.button("SUBMIT"):
                         except (AttributeError, TypeError):
                             st.warning("Image Unavailable")
                         try:
-                            elements = soup1.find_all(class_="a-size-base a-link-normal")
-                            rat = ' '.join([element.get_text() for element in elements])
-                            rat=rat.replace(" ",'')
-                            l_star_rating = []
-                            c = 0
-                            e = 0
-                            r = ['5', '4', '3', '2', '1']
-                            for i in rat:
-                                if i == "%":
-                                    if rat[c - 5] == r[e] or rat[c - 6] == r[e] or rat[c - 7] == r[e] or rat[c - 9] == r[e] or rat[c - 8] == r[e]:
-                                        if rat[c - 3] == "r":
-                                            l_star_rating.append(int(rat[c - 2:c]))
-                                            e = e + 1
-                                            c = c + 1
-                                        elif rat[c - 2] == 'r':
-                                            l_star_rating.append(int(rat[c - 1:c]))
-                                            c = c + 1
-                                            e = e + 1
-                                        else:
-                                            l_star_rating.append(int(rat[c - 3:c]))
-                                            c = c + 1
-                                            e = e + 1
-                                    else:
-                                        l_star_rating.append(0)
-                                        if rat[c - 3] == "r":
-                                            l_star_rating.append(int(rat[c - 2:c]))
-                                            e = e + 1
-                                            c = c + 1
-                                        else:
-                                            l_star_rating.append(int(rat[c - 1:c]))
-                                            c = c + 1
-                                            e = e + 1
-                                else:
-                                    c = c + 1
-
-                            while len(l_star_rating) != 5:
-                                l_star_rating.append(0)
+                            histogram_table = soup1.find(id='histogramTable')
+                            if histogram_table:
+                                a_text_right = histogram_table.find(class_='a-text-right')
+                                if a_text_right:
+                                    text_content = a_text_right.get_text()
+                                    l_star_rating = re.findall(r'(\d+)%', text_content)
+                                    l_star_rating = [int(num) for num in l_star_rating]
+                                    l_star_rating.pop()
 
                         except AttributeError:
                             st.warning("Star_Rating Unavailable")
@@ -159,16 +130,16 @@ if st.button("SUBMIT"):
                             amazonrev=AmazonReviewExtractor()
                             rev_sum=amazonrev.get_reviews_summary(soup1)
                         except Exception as e:
-                            st.error(f"Error: {e}")
+                            st.error(f"Error: {e} Reviews Unavailable :(")
                     except Exception as e:
                         st.error(f"Error: {e}")
                     
-
             with image_right:        
                 st.image(img)
         with st.container():
             amazon_des=AmazonDescription()
             description=amazon_des.description_amazon(soup1)
+            st.write("---")
             st.header("Specifications:")
             for paragraph in description:
                 if paragraph:
@@ -177,6 +148,8 @@ if st.button("SUBMIT"):
                         st.write(f"**{heading.strip()}** - {content.strip()}")
                     except ValueError:
                         st.write(paragraph)
+
+        st.write("---")
         with st.container():
             rev_left,rev_right=st.columns((2,3))
             with rev_right:
@@ -283,12 +256,22 @@ if st.button("SUBMIT"):
                         """,
                         unsafe_allow_html=True
                     )
+                st.write("---")
+                def display_as_points(summary_list):
+                    for point in summary_list:
+                        if point:  # Avoid empty strings
+                            st.write(f"- {point.strip()}.")
+
+                # Assuming rev_sum[2] and rev_sum[3] are lists of summarized points
+                st.write("### Positive Review Summary:")
+                display_as_points(rev_sum[2])
+
+                st.write("### Negative Review Summary:")
+                display_as_points(rev_sum[3])
+                
+                st.write("---")
+
                 st.header("Key Specifications:")
                 specs=specifications.spec(soup1)
                 df = pd.DataFrame(specs.items(),columns=["Specs","Value"])
                 st.write(df)
-                                    
-
-
-
-
